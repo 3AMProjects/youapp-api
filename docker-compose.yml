@@ -1,0 +1,45 @@
+version: '3'
+
+services:
+  # Define the Nest.js application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest_app
+    restart: always
+    ports:
+      - '3000:3000' # Expose port 3000
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/youapp-backend
+      - JWT_SECRET=yourSuperSecretKey
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  # MongoDB Service
+  mongo:
+    image: mongo:4.4
+    container_name: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db # Use a volume for persistent storage
+
+  # RabbitMQ Service
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - '5672:5672' # Expose RabbitMQ port
+      - '15672:15672' # Expose RabbitMQ management console port
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+# Define volumes for persistent storage
+volumes:
+  mongo-data:
+  rabbitmq-data:
