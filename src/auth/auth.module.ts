@@ -8,7 +8,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     UsersModule,
     JwtModule.register({
-      secret: 'defaultSecret', // Ensure the secret is configured
+      secret: process.env.JWT_SECRET || 'defaultSecret', // Ensure the secret is configured
       signOptions: { expiresIn: '1h' }, // Set the token expiration time
     }),
   ],
