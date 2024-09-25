@@ -49,7 +49,6 @@ async function bootstrap() {
 
   // Start the main HTTP server on port 3000 (or from environment)
   await app.listen(process.env.PORT || 3000);
-  console.log('JWT_SECRET:', process.env.JWT_SECRET);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

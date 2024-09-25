@@ -70,4 +70,16 @@ export class AuthService {
 
     return null;
   }
+  // Get user profile by ID
+  async getProfile(userId: string): Promise<any> {
+    const user = await this.usersService.findById(userId);
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Return user data excluding the password
+    const { ...userProfile } = user.toObject();
+    return userProfile;
+  }
 }
