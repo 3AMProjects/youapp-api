@@ -9,7 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 
-@WebSocketGateway({ cors: true }) // Enable CORS for cross-origin requests
+@WebSocketGateway({ cors: true })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -17,23 +17,20 @@ export class ChatGateway
 
   constructor(private readonly chatService: ChatService) {}
 
-  // When the gateway is initialized
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   afterInit(server: Server) {
     console.log('Socket.IO initialized');
   }
 
-  // When a client connects
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
   }
 
-  // When a client disconnects
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  // Subscribe to 'joinRoom' event (for joining a chat room)
+  // Subscribe to 'joinRoom' event
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(client: Socket, room: string): Promise<void> {
     client.join(room);
@@ -42,7 +39,7 @@ export class ChatGateway
       .emit('message', `User ${client.id} has joined the room ${room}`);
   }
 
-  // Subscribe to 'message' event (for sending messages)
+  // Subscribe to 'sendMessage' event
   @SubscribeMessage('sendMessage')
   async handleSendMessage(
     client: Socket,
@@ -54,7 +51,7 @@ export class ChatGateway
     }: { room: string; senderId: string; receiverId: string; message: string },
   ): Promise<void> {
     // Save the message to the database
-    const savedMessage = await this.chatService.saveMessage(
+    const savedMessage = await this.chatService.createMessage(
       room,
       senderId,
       receiverId,
@@ -65,7 +62,7 @@ export class ChatGateway
     this.server.to(room).emit('message', savedMessage);
   }
 
-  // Subscribe to 'getMessages' event (to retrieve chat history)
+  // Subscribe to 'getMessages' event (retrieve chat history)
   @SubscribeMessage('getMessages')
   async handleGetMessages(client: Socket, room: string): Promise<void> {
     const messages = await this.chatService.getMessagesByRoom(room);
